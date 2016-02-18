@@ -10,10 +10,89 @@
 package com.mchz.errorhandle.implement;
 
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.commons.lang.StringUtils;
+import com.mchz.errorhandle.util.ConnectionManagerSsh;
+
+
 /**
  * Linux剩余空间
  * 
  * @author sandy
  */
 public class LinuxFreeSpace {
+
+	// 扩充20M大小（单位KB）
+	private long				TBS_ADDSIZE_20M		= 1024 * 20;
+	private static final String	COMMAND_LINE_FIRST	= "df ";		// 命令行
+
+	/**
+	 * 判断剩余磁盘空间是否可扩充
+	 * 
+	 * @param tbsFilePath
+	 * @return true
+	 */
+	public boolean isAvailable(String tbsFilePath) {
+		long availableSize = 0;
+		// 判断系统类型，win或其他
+		String osName = System.getProperty("os.name").toLowerCase();
+		int sysNo = osName.indexOf("win");
+		if (sysNo >= 0) {// windows
+			File file = null;
+			try {
+				file = new File(tbsFilePath);
+				if (file.exists()) {
+					availableSize = file.getFreeSpace();
+				} else {
+					System.out.println("该文件不存在");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {// 其他
+			availableSize = getDiskSize(tbsFilePath);
+		}
+		// 判断磁盘剩余空间大小（20M）
+		if (availableSize > TBS_ADDSIZE_20M) {
+			System.out.println("剩余空间大于20M，可以扩充！");
+			return true;
+		} else {
+			System.out.println("剩余空间不足20M，无法扩充！");
+			return false;
+		}
+	}
+
+	// 获取磁盘剩余空间大小
+	private long getDiskSize(String tbsFilePath) {
+		String matchLine = null;
+		String commandLine = COMMAND_LINE_FIRST + tbsFilePath;
+		String readTemp = getedCommandLineResult(commandLine);
+		if (!StringUtils.isEmpty(readTemp)) {
+			Pattern pattern = Pattern.compile("[ ][\\d]+[ ]");
+			Matcher matcher = pattern.matcher(readTemp);
+			while (matcher.find()) {
+				matchLine = matcher.group().trim();
+			}
+			return Long.parseLong(matchLine);
+		} else
+			return 0;
+	}
+
+	private String getedCommandLineResult(String commandLine) {
+		String readTemp = null;
+		String readLine = null;
+		try {
+			BufferedReader bufferedReader = ConnectionManagerSsh.getInstance().execCommand(commandLine);
+			while ((readLine = bufferedReader.readLine()) != null) {
+				readTemp = readLine;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		return readTemp;
+	}
 }
