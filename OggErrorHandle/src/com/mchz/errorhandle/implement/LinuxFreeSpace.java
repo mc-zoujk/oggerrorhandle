@@ -15,6 +15,7 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import com.mchz.errorhandle.util.ConnectionManagerSsh;
 
 
@@ -25,9 +26,10 @@ import com.mchz.errorhandle.util.ConnectionManagerSsh;
  */
 public class LinuxFreeSpace {
 
+	private static final Logger	logger				= Logger.getLogger(LinuxFreeSpace.class);
 	// 扩充20M大小（单位KB）
 	private long				TBS_ADDSIZE_20M		= 1024 * 20;
-	private static final String	COMMAND_LINE_FIRST	= "df ";		// 命令行
+	private static final String	COMMAND_LINE_FIRST	= "df ";									// 命令行
 
 	/**
 	 * 判断剩余磁盘空间是否可扩充
@@ -57,19 +59,24 @@ public class LinuxFreeSpace {
 		}
 		// 判断磁盘剩余空间大小（20M）
 		if (availableSize > TBS_ADDSIZE_20M) {
-			System.out.println("剩余空间大于20M，可以扩充！");
+			logger.info("剩余空间大于20M，可以扩充！");
 			return true;
 		} else {
-			System.out.println("剩余空间不足20M，无法扩充！");
+			logger.info("剩余空间不足20M，无法扩充！");
 			return false;
 		}
 	}
 
-	// 获取磁盘剩余空间大小
+	/**
+	 * 获取磁盘剩余空间大小
+	 * 
+	 * @param tbsFilePath
+	 * @return
+	 */
 	private long getDiskSize(String tbsFilePath) {
 		String matchLine = null;
 		String commandLine = COMMAND_LINE_FIRST + tbsFilePath;
-		String readTemp = getedCommandLineResult(commandLine);
+		String readTemp = getCommandLineResult(commandLine);
 		if (!StringUtils.isEmpty(readTemp)) {
 			Pattern pattern = Pattern.compile("[ ][\\d]+[ ]");
 			Matcher matcher = pattern.matcher(readTemp);
@@ -81,7 +88,13 @@ public class LinuxFreeSpace {
 			return 0;
 	}
 
-	private String getedCommandLineResult(String commandLine) {
+	/**
+	 * 执行SSH命令
+	 * 
+	 * @param commandLine
+	 * @return
+	 */
+	private String getCommandLineResult(String commandLine) {
 		String readTemp = null;
 		String readLine = null;
 		try {
