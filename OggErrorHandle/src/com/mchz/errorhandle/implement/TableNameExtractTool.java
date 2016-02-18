@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 public class TableNameExtractTool {
 	private final static String MATCH_TBS_NAME = "(tablespace)[ ]+[^ ]+";
 	private final static String MATCH_TABLE_NAME = "(table)[ ]+[^ ]+";
+	private final static String MATCH_COMPRESS_NAME = "(UPDATE)[ ]+[^ ]+";
 	private final static String MATCH_QUOTATION = "[\"|']";
 	private final static String MATCH_PERIOD = "[.]\\B";
 	
@@ -35,6 +36,18 @@ public class TableNameExtractTool {
 
 		if (matcher.find()) {
 			return getTableOrSpaceName(matcher.group());
+		}
+
+		return null;
+	}
+	
+	// 获取压缩表表名
+	public String getCompressTableName(String errorLine) {
+		Pattern pattern = Pattern.compile(MATCH_COMPRESS_NAME);
+		Matcher matcher = pattern.matcher(errorLine);
+
+		if (matcher.find()) {
+			return getTableOrSpaceName(matcher.group(0));
 		}
 
 		return null;
