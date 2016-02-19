@@ -71,7 +71,7 @@ public class QueryTableSpace {
 	 * @param user
 	 * @return
 	 */
-	public List<String> getTableSpaceByName(String user) {
+	public List<String> getTableSpaceByName(String spaceName) {
 		List<String> list = new ArrayList<String>();
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -81,7 +81,7 @@ public class QueryTableSpace {
 			conn = DriverManager.getConnection(PropertiesConfig.jdbcUrl, PropertiesConfig.user,
 					PropertiesConfig.password);
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, user);
+			pstmt.setString(1, spaceName);
 			ResultSet rs = pstmt.executeQuery();
 			logger.info(sql);
 			while (rs.next()) {

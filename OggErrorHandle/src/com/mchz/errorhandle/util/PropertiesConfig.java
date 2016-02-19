@@ -33,7 +33,6 @@ public class PropertiesConfig {
 	public static String		hostIp			= null;
 	public static int			oggPort			= 0;
 	public static int			sshPort			= 0;
-	public static String		tablespaceDir	= null;
 	public static int			checkTimer		= 0;
 	public static String		osUser			= null;
 	public static String		osPassword		= null;
@@ -65,8 +64,6 @@ public class PropertiesConfig {
 		else
 			sshPort = Integer.parseInt(sshPortStr);
 		logger.debug("sshPort:" + sshPort);
-		tablespaceDir = readValueByPassword("tablespace.dir");
-		logger.debug("tablespaceDir:" + tablespaceDir);
 		String checkTimerStr = readValueByPassword("check.timer");
 		if (StringUtils.isEmpty(checkTimerStr))
 			checkTimer = 60;

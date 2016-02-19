@@ -35,7 +35,7 @@ public class ExcludeCompressedTable {
 	private static final Logger	logger	= Logger.getLogger(ExcludeCompressedTable.class);
 	private DateFormat			df		= DateFormat.getDateTimeInstance(3, 3);
 
-	public String getFile(String filename) throws GDSCException {
+	public String getFile(String filename){
 		filename = "param " + filename;
 		Connection con = null;
 		Response reply = null;
@@ -79,9 +79,9 @@ public class ExcludeCompressedTable {
 				logger.debug("GETFILE " + filename);
 			}
 		} catch (ConnectException e) {
-			throw new GDSCNetConnectException(e.getMessage());
+			logger.error(e.getMessage());
 		} catch (GDSCException h) {
-			throw h;
+			logger.error(h.getMessage());
 		} finally {
 			if (con != null) {
 				ConnectionManagerOgg.getInstance().releaseConnection(con);
@@ -90,7 +90,7 @@ public class ExcludeCompressedTable {
 		return retval.toString();
 	}
 
-	public void putFile(String filename, String filetext, boolean overwrite) throws GDSCException {
+	public void putFile(String filename, String filetext, boolean overwrite){
 		filename = "param " + filename;
 		Connection con = null;
 		Response reply = null;
@@ -125,9 +125,9 @@ public class ExcludeCompressedTable {
 				logger.debug("PUTFILE " + filename);
 			}
 		} catch (ConnectException e) {
-			throw new GDSCNetConnectException(e.getMessage());
+			logger.error(e.getMessage());
 		} catch (GDSCException h) {
-			throw h;
+			logger.error(h.getMessage());
 		} finally {
 			if (con != null) {
 				ConnectionManagerOgg.getInstance().releaseConnection(con);
@@ -135,7 +135,7 @@ public class ExcludeCompressedTable {
 		}
 	}
 
-	private void createBackup(String fileName) throws GDSCException {
+	private void createBackup(String fileName){
 		Connection con = null;
 		Response reply = null;
 		StringBuffer text = new StringBuffer();
@@ -173,9 +173,9 @@ public class ExcludeCompressedTable {
 				throw new GDSCNetHostFileException(reply.getError());
 			}
 		} catch (ConnectException e) {
-			throw new GDSCNetConnectException(e.getMessage());
+			logger.error(e.getMessage());
 		} catch (GDSCException ge) {
-			throw ge;
+			logger.error(ge.getMessage());
 		} finally {
 			if (con != null) {
 				ConnectionManagerOgg.getInstance().releaseConnection(con);
@@ -183,21 +183,21 @@ public class ExcludeCompressedTable {
 		}
 	}
 
-	public static void main(String[] args) {
-		ExcludeCompressedTable e = new ExcludeCompressedTable();
-		String a = "";
-		try {
-			a = e.getFile("param TJ_DMP");
-		} catch (GDSCException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		a = a + "\r\n" + "Tableexclude test.test1;";
-		try {
-			e.putFile("param TJ_DMP", a, true);
-		} catch (GDSCException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-	}
+//	public static void main(String[] args) {
+//		ExcludeCompressedTable e = new ExcludeCompressedTable();
+//		String a = "";
+//		try {
+//			a = e.getFile("param TJ_DMP");
+//		} catch (GDSCException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//		a = a + "\r\n" + "Tableexclude test.test1;";
+//		try {
+//			e.putFile("param TJ_DMP", a, true);
+//		} catch (GDSCException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//	}
 }

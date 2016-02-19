@@ -2615,3 +2615,33 @@ EXTRACT     RUNNING     TJ_EXT      00:00:00      00:00:09
 16/02/18 09:19:57  INFO com.goldengate.gdsc.server.net.ggsci.Connection-connectSocket:649 GGSCI Connect Socket Succeeded on 172.16.10.17:7842
 16/02/18 09:19:57 ERROR com.mchz.errorhandle.business.CheckErrorProcess-doCheckErrorProcess:35 BK_DMP is not running
 16/02/18 09:20:06 ERROR com.mchz.errorhandle.business.CheckErrorProcess-doCheckErrorProcess:35 BK_DMP is not running
+16/02/19 13:40:11 ERROR com.mchz.errorhandle.implement.SimpleMailSender-sendMail:190 Could not connect to SMTP host: smtp.ym.163.com, port: 25
+javax.mail.MessagingException: Could not connect to SMTP host: smtp.ym.163.com, port: 25;
+  nested exception is:
+	java.net.ConnectException: Connection timed out: connect
+	at com.sun.mail.smtp.SMTPTransport.openServer(SMTPTransport.java:1545)
+	at com.sun.mail.smtp.SMTPTransport.protocolConnect(SMTPTransport.java:453)
+	at javax.mail.Service.connect(Service.java:313)
+	at javax.mail.Service.connect(Service.java:172)
+	at javax.mail.Service.connect(Service.java:121)
+	at javax.mail.Transport.send0(Transport.java:190)
+	at javax.mail.Transport.send(Transport.java:142)
+	at com.mchz.errorhandle.implement.SimpleMailSender.sendMail(SimpleMailSender.java:182)
+	at com.mchz.errorhandle.implement.SimpleMailSender.main(SimpleMailSender.java:332)
+Caused by: java.net.ConnectException: Connection timed out: connect
+	at java.net.DualStackPlainSocketImpl.connect0(Native Method)
+	at java.net.DualStackPlainSocketImpl.socketConnect(DualStackPlainSocketImpl.java:79)
+	at java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:339)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:200)
+	at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:182)
+	at java.net.PlainSocketImpl.connect(PlainSocketImpl.java:172)
+	at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.net.Socket.connect(Socket.java:579)
+	at java.net.Socket.connect(Socket.java:528)
+	at com.sun.mail.util.SocketFetcher.createSocket(SocketFetcher.java:267)
+	at com.sun.mail.util.SocketFetcher.getSocket(SocketFetcher.java:227)
+	at com.sun.mail.smtp.SMTPTransport.openServer(SMTPTransport.java:1511)
+	... 8 more
+16/02/19 13:40:11 ERROR com.mchz.errorhandle.implement.SimpleMailSender-sendMail:200 alert mail send error!
+16/02/19 13:41:37  INFO com.mchz.errorhandle.implement.SimpleMailSender-sendMail:184 alert mail send success!
+16/02/19 14:31:17  INFO com.mchz.errorhandle.implement.SimpleMailSender-sendMail:183 alert mail send success!

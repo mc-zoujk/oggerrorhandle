@@ -27,17 +27,15 @@ import com.mchz.errorhandle.util.ConnectionManagerSsh;
 public class LinuxFreeSpace {
 
 	private static final Logger	logger				= Logger.getLogger(LinuxFreeSpace.class);
-	// 扩充20M大小（单位KB）
-	private long				TBS_ADDSIZE_20M		= 1024 * 20;
 	private static final String	COMMAND_LINE_FIRST	= "df ";									// 命令行
 
 	/**
-	 * 判断剩余磁盘空间是否可扩充
+	 * 返回剩余空间大小
 	 * 
 	 * @param tbsFilePath
-	 * @return true
+	 * @return
 	 */
-	public boolean isAvailable(String tbsFilePath) {
+	public long isAvailable(String tbsFilePath) {
 		long availableSize = 0;
 		// 判断系统类型，win或其他
 		String osName = System.getProperty("os.name").toLowerCase();
@@ -49,22 +47,15 @@ public class LinuxFreeSpace {
 				if (file.exists()) {
 					availableSize = file.getFreeSpace();
 				} else {
-					System.out.println("该文件不存在");
+					logger.error("该文件不存在");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		} else {// 其他
-			availableSize = getDiskSize(tbsFilePath);
+			availableSize = getDiskSize(tbsFilePath) * 1024;
 		}
-		// 判断磁盘剩余空间大小（20M）
-		if (availableSize > TBS_ADDSIZE_20M) {
-			logger.info("剩余空间大于20M，可以扩充！");
-			return true;
-		} else {
-			logger.info("剩余空间不足20M，无法扩充！");
-			return false;
-		}
+		return availableSize;
 	}
 
 	/**
