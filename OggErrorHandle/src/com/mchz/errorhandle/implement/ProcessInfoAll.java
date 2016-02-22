@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import com.goldengate.gdsc.server.net.ggsci.Connection;
 import com.goldengate.gdsc.server.net.ggsci.Response;
 import com.mchz.errorhandle.util.ConnectionManagerOgg;
+import com.mchz.errorhandle.util.PropertiesConfig;
 
 
 /**
@@ -50,6 +51,9 @@ public class ProcessInfoAll {
 			}
 		} catch (Exception e) {
 			logger.error("ProcessInfoAll:" + e.getMessage());
+			// ogg连接报错的时候，发送邮件
+			SimpleMailSender mail = new SimpleMailSender();
+			mail.sendMail(PropertiesConfig.hostIp + ":" + "ogg无法获取连接", e.getMessage());
 		} finally {
 			if (con != null) {
 				ConnectionManagerOgg.getInstance().releaseConnection(con);

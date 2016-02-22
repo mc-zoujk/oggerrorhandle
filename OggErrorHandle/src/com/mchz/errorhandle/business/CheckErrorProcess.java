@@ -11,9 +11,6 @@ package com.mchz.errorhandle.business;
 
 
 import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
 import com.mchz.errorhandle.dao.ExecuteSQL;
@@ -26,6 +23,7 @@ import com.mchz.errorhandle.implement.SimpleMailSender;
 import com.mchz.errorhandle.implement.StartProcess;
 import com.mchz.errorhandle.implement.TableNameExtractTool;
 import com.mchz.errorhandle.implement.ViewReport;
+import com.mchz.errorhandle.util.PropertiesConfig;
 
 
 /**
@@ -57,22 +55,23 @@ public class CheckErrorProcess {
 		if (!processTypeName.equals("0")) {
 			boolean handleError = false;
 			String[] process = processTypeName.split("@@");
-			logger.error(process[1] + " is not running");
+			logger.info(process[1] + " is not running");
 			// 根据进程名称，返回错误和告警列表
 			List<String> errorList = viewReport.viewErrorReport(process[1]);
 			if (EXTRACT_TYPE.equalsIgnoreCase(process[0])) {
 				// 处理挖掘进程的错误
 				// 找到错误内容
 				for (String errorLine : errorList) {
-					logger.info(errorLine);
 					if (errorLine.indexOf("OGG-01433") > 0) {
+						logger.info(errorLine);
+						handleError = compressedTableError(errorLine, process[1]);
+						break;
+					} else if (errorLine.indexOf("OGG-00455") > 0) {
+						logger.info(errorLine);
 						handleError = compressedTableError(errorLine, process[1]);
 						break;
 					}
 				}
-				// 是否需要重启进程
-				if (handleError)
-					startProcess.doStartProcess(process[1]);
 			} else if (REPLICAT_TYPE.equalsIgnoreCase(process[0])) {
 				// 处理应用进程的错误
 				// 找到错误内容
@@ -96,17 +95,19 @@ public class CheckErrorProcess {
 						}
 					}
 				}
-				// 是否需要重启进程
-				if (handleError)
-					startProcess.doStartProcess(process[1]);
-			    SimpleMailSender mail = new SimpleMailSender();
-			    logger.info("Starts sending mail");
-			    StringBuffer sb = new StringBuffer();
-			    for(String s:errorList){
-			    	sb.append(s);
-			    }
-			    mail.sendMail(process[1] +"未运行状态", sb.toString());
 			}
+			// 是否需要重启进程
+			if (handleError)
+				startProcess.doStartProcess(process[1]);
+			SimpleMailSender mail = new SimpleMailSender();
+			StringBuffer sb = new StringBuffer();
+			for (String s : errorList) {
+				sb.append(s).append("\r\n");
+			}
+			if (handleError)
+				mail.sendMail(PropertiesConfig.hostIp + ":" + process[1] + "进程已重启", sb.toString());
+			else
+				mail.sendMail(PropertiesConfig.hostIp + ":" + process[1] + "未运行状态", sb.toString());
 		}
 	}
 
@@ -209,14 +210,17 @@ public class CheckErrorProcess {
 	 */
 	private boolean compressedTableError(String errorLine, String processName) {
 		// 查找压缩表表名
-		String tableName = tableNameExtractTool.getCompressTableName(errorLine);
+		String tableName = tableNameExtractTool.getCompressTableName(errorLine).toLowerCase();
+		logger.info("需要排除的压缩表名:" + tableName);
 		if (tableName != null) {
-			String[] shcemaTablename = tableName.split(".");
-			String allTable = "table shcemaTablename[0]" + ".*;";
+			String[] shcemaTablename = tableName.split("\\.");
+			String allTable = "table " + shcemaTablename[0] + ".*;";
 			String prmText = excludeCompressedTable.getFile(processName);
 			String prmTestLowerCase = prmText.toLowerCase();
 			if (prmTestLowerCase.indexOf(allTable) > 0) {
-				prmText = prmText + "\r\n" + "Tableexclude " + shcemaTablename;
+				String excludeTable = "tableexclude " + tableName + ";";
+				if (prmTestLowerCase.indexOf(excludeTable) < 0)
+					prmText = prmText + "\r\n" + excludeTable;
 			} else {
 				prmText = prmText.replaceAll("[T|t][A|a][B|b][L|l][E|e][ ]+(" + tableName.toUpperCase() + ";)", "")
 						.replaceAll("[T|t][A|a][B|b][L|l][E|e][ ]+(" + tableName.toLowerCase() + ";)", "");

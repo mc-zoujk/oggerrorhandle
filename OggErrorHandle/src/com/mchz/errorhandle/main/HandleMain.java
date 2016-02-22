@@ -23,7 +23,8 @@ import com.mchz.errorhandle.util.PropertiesConfig;
  */
 public class HandleMain {
 
-	private static final Logger	logger	= Logger.getLogger(HandleMain.class);
+	private static final Logger	logger			= Logger.getLogger(HandleMain.class);
+	public static int			mailHashCode	= 0;
 
 	/**
 	 * @param args

@@ -1,8 +1,6 @@
 package com.mchz.errorhandle.implement;
 
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -27,6 +25,7 @@ import javax.mail.internet.MimeUtility;
 import org.apache.log4j.Logger;
 import com.mchz.errorhandle.domain.MailSenderInfo;
 import com.mchz.errorhandle.domain.MyAuthenticator;
+import com.mchz.errorhandle.main.HandleMain;
 import com.mchz.errorhandle.util.PropertiesConfig;
 
 
@@ -69,6 +68,15 @@ public class SimpleMailSender {
 	}
 
 	public boolean sendMail(String subject, String content) {
+		if (content != null) {
+			int contentHashCode = content.hashCode();
+			if (HandleMain.mailHashCode == contentHashCode) {
+				logger.info("邮件内容重复，不再发送");
+				return true;
+			} else {
+				HandleMain.mailHashCode = contentHashCode;
+			}
+		}
 		if (enable && mailInfo.getToAddress() != null) {
 			mailInfo.setSubject(subject);
 			mailInfo.setContent(content);
@@ -170,19 +178,16 @@ public class SimpleMailSender {
 			// transport.close();
 			flag = true;
 		} catch (AddressException e) {
-			logger.error(e.getMessage(), e);
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (MessagingException e) {
-			logger.error(e.getMessage(), e);
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (UnsupportedEncodingException e) {
-			logger.error(e.getMessage(), e);
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		if (flag) {
-			logger.info("alert mail send success!");;
+			logger.info("mail send success!");;
 		} else {
-			logger.error("alert mail send error!");;
+			logger.error("mail send error!");;
 		}
 		return flag;
 	}
@@ -271,11 +276,11 @@ public class SimpleMailSender {
 			transport.close();
 			flag = true;
 		} catch (AddressException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (MessagingException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		return flag;
 	}
