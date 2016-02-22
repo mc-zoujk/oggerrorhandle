@@ -32,6 +32,7 @@ public class HandleMain {
 	public static void main(String[] args) {
 		final CheckErrorProcess check = new CheckErrorProcess();
 		PropertiesConfig config = new PropertiesConfig();
+		// 获取配置文件
 		config.getParameter();
 		Runnable runnable = new Runnable(){
 

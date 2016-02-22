@@ -16,7 +16,7 @@ public class TableNameExtractTool {
 	private static final Logger	logger				= Logger.getLogger(ProcessInfoAll.class);
 	private final static String	MATCH_TBS_NAME		= "(tablespace)[ ]+[^ ]+";
 	private final static String	MATCH_COMPRESS_NAME	= "(table)[ ]+[^ ]+[.][^ ]+";
-	private final static String	MATCH_UPDATE_NAME	= "(UPDATE)[ ]+[^ ]+";
+	private final static String	MATCH_UPDATE_NAME	= "(UPDATE)(.)+[^ ]+[.][^ ]+";
 	private final static String	MATCH_QUOTATION		= "[\"|']";
 	private final static String	MATCH_PERIOD		= "[.]\\B";
 

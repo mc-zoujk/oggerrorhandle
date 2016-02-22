@@ -14,8 +14,8 @@ public class LogAnalyzeDispose {
 	// 正则匹配
 	private Pattern pattern;
 	private Matcher matcher;
-	// 匹配字符串(表空间满）
-	private final static String MATCH_ORA_01654 = "(ORA-01654)";
+	// 匹配字符串(表空间满）01654 改成 01653
+	private final static String MATCH_ORA_01653 = "(ORA-01653)";
 	// 匹配字符串(表空间不存在）
 	private final static String MATCH_ORA_00959 = "(ORA-00959)";
 	// 匹配字符串(分区表未打开行迁移）
@@ -28,7 +28,7 @@ public class LogAnalyzeDispose {
 	 */
 	public int getErrorType(String readLineTemp) {
 		// 表空间满匹配
-		pattern = Pattern.compile(MATCH_ORA_01654);
+		pattern = Pattern.compile(MATCH_ORA_01653);
 		matcher = pattern.matcher(readLineTemp);
 		if (matcher.find())
 			return 1;
@@ -55,7 +55,7 @@ public class LogAnalyzeDispose {
 	 */
 	public boolean isErrorLine(String readLineTemp) {
 		// 表空间满匹配
-		pattern = Pattern.compile(MATCH_ORA_01654);
+		pattern = Pattern.compile(MATCH_ORA_01653);
 		matcher = pattern.matcher(readLineTemp);
 		if (matcher.find())
 			return true;

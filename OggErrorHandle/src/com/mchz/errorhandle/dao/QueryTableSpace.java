@@ -81,7 +81,7 @@ public class QueryTableSpace {
 			conn = DriverManager.getConnection(PropertiesConfig.jdbcUrl, PropertiesConfig.user,
 					PropertiesConfig.password);
 			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, spaceName);
+			pstmt.setString(1, spaceName.toUpperCase());
 			ResultSet rs = pstmt.executeQuery();
 			logger.info(sql);
 			while (rs.next()) {

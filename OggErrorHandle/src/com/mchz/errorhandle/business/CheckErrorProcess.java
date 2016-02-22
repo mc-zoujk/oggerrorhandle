@@ -74,25 +74,31 @@ public class CheckErrorProcess {
 				}
 			} else if (REPLICAT_TYPE.equalsIgnoreCase(process[0])) {
 				// 处理应用进程的错误
+				boolean tag = false;
 				// 找到错误内容
 				for (String errorLine : errorList) {
-					logger.info(errorLine);
+					// logger.info(errorLine);
 					// 是否是已知错误
 					// 根据错误类型分类，及处理错误
 					if (logAnalyzeDispose.isErrorLine(errorLine)) {
 						switch (logAnalyzeDispose.getErrorType(errorLine)) {
 							case TBS_OVERFLOW:// 表空间满
 								handleError = addTableSpaceError(errorLine);
+								tag = true;
 								break;
 							case TBS_NOEXIST:// 表空间不存在
 								handleError = createTableSpaceError(errorLine);
+								tag = true;
 								break;
 							case ROW_MOVEMENT_UNABLE:// 分区表未打开行迁移
 								handleError = rowMovementError(errorLine);
+								tag = true;
 								break;
 							default:
 								break;
 						}
+						if (tag)
+							break;
 					}
 				}
 			}
@@ -119,6 +125,7 @@ public class CheckErrorProcess {
 	private boolean addTableSpaceError(String errorLine) {
 		// 获取表空间名称
 		String tableSpaceName = tableNameExtractTool.getTbsName(errorLine);
+		logger.info(tableSpaceName + "表空间满");
 		// 获取表空间路径
 		List<String> list = queryTableSpace.getTableSpaceByName(tableSpaceName);
 		String spacePath = list.get(0);
@@ -126,15 +133,16 @@ public class CheckErrorProcess {
 		String parentPath = file.getParent();
 		String maxNum = getMaxNum(list);
 		// 获取剩余空间大小
-		Long freeSpace = linuxFreeSpace.isAvailable(parentPath);
-		if (freeSpace > 1024 * 1024 * 1024 * 4) {
+		Long freeSpace = linuxFreeSpace.isAvailable(spacePath);
+		Long minSpace = 1024L * 1024 * 1024 * 4;
+		if (freeSpace > minSpace) {
 			String newPath = parentPath + File.separator + tableSpaceName.toLowerCase() + maxNum + ".dbf";
-			String sql = "Alter tablespace " + tableSpaceName.toLowerCase() + " add datafile '" + newPath
-					+ "' size 500m maxsize 4g autoextend on";
+			String sql = "Alter tablespace " + tableSpaceName + " add datafile '" + newPath
+					+ "' size 200m autoextend on maxsize 1000m";
 			boolean result = executeSQL.executeSql(sql);
 			return result;
 		} else {
-			logger.error("剩余磁盘空间不足");
+			logger.error("剩余磁盘空间不足，无法增加表空间");
 			return false;
 		}
 	}
@@ -176,15 +184,16 @@ public class CheckErrorProcess {
 		File file = new File(spacePath);
 		String parentPath = file.getParent();
 		// 获取剩余空间大小
-		Long freeSpace = linuxFreeSpace.isAvailable(parentPath);
-		if (freeSpace > 1024 * 1024 * 1024 * 4) {
-			String newPath = parentPath + File.separator + tableSpaceName.toLowerCase() + "01.dbf";
-			String sql = "create tablespace " + tableSpaceName.toLowerCase() + " datafile '" + newPath
-					+ "' size 500M maxsize 4g autoextend on";
+		Long freeSpace = linuxFreeSpace.isAvailable(spacePath);
+		Long minSpace = 1024L * 1024 * 1024 * 4;
+		if (freeSpace > minSpace) {
+			String newPath = parentPath + File.separator + tableSpaceName.toLowerCase() + "02.dbf";
+			String sql = "create tablespace " + tableSpaceName + " datafile '" + newPath
+					+ "' size 200m autoextend on maxsize 1000m";
 			boolean result = executeSQL.executeSql(sql);
 			return result;
 		} else {
-			logger.error("剩余磁盘空间不足");
+			logger.error("剩余磁盘空间不足，无法新建表空间");
 			return false;
 		}
 	}
