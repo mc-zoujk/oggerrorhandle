@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 Ant-Version: Apache Ant 1.7.1
-Class-Path: lib/c3p0-0.9.1.2.jar lib/commons-codec.jar lib/commons-lang-2.5.jar lib/commons-logging.jar lib/jasypt-1.5.jar lib/log4j-1.2.14.jar lib/ojdbc6.jar config/
-Main-Class: com.mchz.changepass.main.EncodeMain
+Class-Path: lib/activation.jar lib/commons-lang-2.5.jar lib/ganymed-ssh2-build210.jar lib/goldengate.jar lib/log4j-1.2.12.jar lib/mail.jar lib/ojdbc6.jar config/
+Main-Class: com.mchz.errorhandle.main.HandleMain
 
