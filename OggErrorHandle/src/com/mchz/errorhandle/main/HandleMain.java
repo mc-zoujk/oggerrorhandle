@@ -24,7 +24,7 @@ import com.mchz.errorhandle.util.PropertiesConfig;
 public class HandleMain {
 
 	private static final Logger	logger			= Logger.getLogger(HandleMain.class);
-	public static int			mailHashCode	= 0;
+	public static int			mailHashCode	= -1;
 
 	/**
 	 * @param args
@@ -35,7 +35,7 @@ public class HandleMain {
 		// 获取配置文件
 		config.getParameter();
 		Runnable runnable = new Runnable(){
-
+ 
 			public void run() {
 				check.doCheckErrorProcess();
 			}
