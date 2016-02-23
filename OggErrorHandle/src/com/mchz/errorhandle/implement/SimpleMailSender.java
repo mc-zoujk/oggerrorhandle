@@ -151,6 +151,10 @@ public class SimpleMailSender {
 				BodyPart part = new MimeBodyPart();
 				part.setContent(senderInfo.getContent(), "text/plain;charset=utf-8");// 设置邮件文本内容
 				multipart.addBodyPart(part);
+			}else if(senderInfo.getContent() != null && "".equals(senderInfo.getContent())){
+				BodyPart part = new MimeBodyPart();
+				part.setContent("无错误或告警信息!", "text/plain;charset=utf-8");// 设置邮件文本内容
+				multipart.addBodyPart(part);
 			}
 			// 附件
 			String attachFileNames[] = senderInfo.getAttachFileNames();
